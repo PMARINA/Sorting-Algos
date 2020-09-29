@@ -1,5 +1,3 @@
-//Reference: https://www.geeksforgeeks.org/merge-sort/
-
 #include <iostream>
 using namespace std;
 
