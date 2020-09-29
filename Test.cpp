@@ -1,5 +1,6 @@
 #include <algorithm>  // only for demo of this test_script, remove later
 #include <cstdint>
+#include <cstring>
 #include <iostream>
 using std::cout;
 using std::endl;
@@ -23,6 +24,9 @@ void (*sorting_algorithm)(uint64_t*, uint64_t*) = sort;
 // void sorting_algorithm(uint64_t* a, uint64_t* b) { sort(a, b); }
 
 void swap(uint64_t arr[], uint64_t i, uint64_t j) {
+  if (i == j) {
+    i = i;
+  }
   uint64_t temp = arr[i];
   arr[i] = arr[j];
   arr[j] = temp;
@@ -31,6 +35,26 @@ void swap(uint64_t arr[], uint64_t i, uint64_t j) {
 bool is_in_order(uint64_t* arr, uint64_t num_elements) {
   for (int i = 0; i < num_elements - 1; i++) {
     if (arr[i] > arr[i + 1]) return false;
+  }
+  return true;
+}
+
+bool all_numbers_present(uint64_t* arr, uint64_t num_elements) {
+  bool* nums = new bool[num_elements];
+  memset(nums, 0, num_elements * sizeof(bool));  // set everything to false
+  for (int i = 0; i < num_elements; i++) {
+    uint64_t val_in_arr = arr[i];
+    if (val_in_arr >= num_elements) {
+      cout << "Item out of range. Could Crash, i: " << i
+           << " val: " << val_in_arr << endl;
+    }
+    nums[arr[i]] = true;
+  }
+  for (int i = 0; i < num_elements; i++) {
+    if (!nums[i]) {
+      cout << "Failed_all_numbers_present: " << i << endl;
+      return false;
+    }
   }
   return true;
 }
@@ -44,13 +68,21 @@ bool test_all_numbers(void (*algo_to_be_tested)(uint64_t*, uint64_t*),
   }
 
   for (uint64_t i = 0; i < num_elements; i++) {
-    swap(test_array, i,
-         uint64_t(double(rand()) / (RAND_MAX) * (num_elements - i)) + i);
+    uint64_t rand_index =
+        uint64_t(double(rand()) / (RAND_MAX) * (num_elements - i - 1)) + i;
+    if (rand_index >= num_elements || rand_index < 0)
+      cout << "WARNING: " << rand_index << " rand index is out of bounds."
+           << endl;
+    swap(test_array, i, rand_index);
   }
 
   algo_to_be_tested(test_array, test_array + num_elements);
-  return is_in_order(test_array, num_elements);
+  bool answer = is_in_order(test_array, num_elements) &&
+                all_numbers_present(test_array, num_elements);
+  delete[] test_array;
+  return answer;
 }
+
 bool test_random_numbers(void (*algo_to_be_tested)(uint64_t*, uint64_t*),
                          uint64_t num_elements) {
   uint64_t* test_array = new uint64_t[num_elements];
@@ -58,12 +90,55 @@ bool test_random_numbers(void (*algo_to_be_tested)(uint64_t*, uint64_t*),
     test_array[i] = uint64_t(double(rand()) / RAND_MAX * UINT64_MAX);
   }
   algo_to_be_tested(test_array, test_array + num_elements);
-  return is_in_order(test_array, num_elements);
+  bool answer = is_in_order(test_array, num_elements);
+  delete[] test_array;
+  return answer;
 }
+
+bool test_ordered_ascending(void (*algo_to_be_tested)(uint64_t*, uint64_t*),
+                            uint64_t num_elements) {
+  uint64_t* test_array = new uint64_t[num_elements];
+  for (uint64_t i = 0; i < num_elements; i++) {
+    test_array[i] = i;
+  }
+  algo_to_be_tested(test_array, test_array + num_elements);
+  bool answer = is_in_order(test_array, num_elements) &&
+                all_numbers_present(test_array, num_elements);
+  delete[] test_array;
+  return answer;
+}
+
+bool test_ordered_descending(void (*algo_to_be_tested)(uint64_t*, uint64_t*),
+                             uint64_t num_elements) {
+  uint64_t* test_array = new uint64_t[num_elements];
+  for (uint64_t i = 0; i < num_elements; i++) {
+    test_array[i] = num_elements - i - 1;
+  }
+  algo_to_be_tested(test_array, test_array + num_elements);
+  bool answer = is_in_order(test_array, num_elements) &&
+                all_numbers_present(test_array, num_elements);
+  delete[] test_array;
+  return answer;
+}
+
 bool run_trials(uint64_t num_elements, uint64_t num_tests) {
   for (uint64_t i = 0; i < num_tests; i++) {
-    if (!test_all_numbers(sorting_algorithm, num_elements)) return false;
-    if (!test_random_numbers(sorting_algorithm, num_elements)) return false;
+    if (!test_all_numbers(sorting_algorithm, num_elements)) {
+      cout << "Failed test_all_numbers" << endl;
+      return false;
+    }
+    if (!test_random_numbers(sorting_algorithm, num_elements)) {
+      cout << "Failed test_random_numbers" << endl;
+      return false;
+    }
+    if (!test_ordered_ascending(sorting_algorithm, num_elements)) {
+      cout << "Failed test_ordered_asc" << endl;
+      return false;
+    }
+    if (!test_ordered_descending(sorting_algorithm, num_elements)) {
+      cout << "Failed test_ordered_des" << endl;
+      return false;
+    }
   }
   return true;
 }
