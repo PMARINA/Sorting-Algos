@@ -100,7 +100,7 @@ bool test_random_numbers(void (*algo_to_be_tested)(uint64_t*, uint64_t*),
                          uint64_t num_elements) {
   uint64_t* test_array = new uint64_t[num_elements];
   random_device rd;
-  uniform_int_distribution<int> distribution(0, INT_MAX);
+  uniform_int_distribution<int> distribution(0, 999999999999);
   for (uint64_t i = 0; i < num_elements; i++) {
     test_array[i] = distribution(rd);
   }
