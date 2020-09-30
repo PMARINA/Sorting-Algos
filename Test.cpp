@@ -1,8 +1,13 @@
 #include <algorithm>  // only for demo of this test_script, remove later
 #include <cstdint>
+#include <cstdio>
 #include <cstring>
 #include <iostream>
 #include <random>
+
+#include "QuickSort.cpp"
+#include "heapsort.cpp"
+#include "mergesort.cc"
 
 using std::cout;
 using std::endl;
@@ -23,10 +28,10 @@ using std::uniform_int_distribution;
  * elements.
  */
 
-void (*sorting_algorithm)(uint64_t*, uint64_t*) = sort;
+void (*sorting_algorithm)(uint64_t*, uint64_t*) = heapsort;
 
 // void sorting_algorithm(uint64_t* a, uint64_t* b) { sort(a, b); }
-
+// This is our original test-code (imo more comprehensive than yours)
 void swap(uint64_t arr[], uint64_t i, uint64_t j) {
   // if (i == 0 || i == 999) cout << i << " paired with: " << j << endl;
   if (i == j) {
@@ -169,3 +174,23 @@ int main(int argc, char** argv) {
     }
   }
 }
+
+// bool run_tests(uint64_t len_and_maxval, uint64_t num_arrays) {}
+
+// int main(int argc, char** argv) {
+//   uint64_t len_and_maxval;
+//   cin >> len_and_maxval;
+//   uint64_t num_arrays;
+//   cin >> num_arrays;
+//   run_tests(len_and_maxval, num_arrays);
+//   uint64_t num_elements;
+//   cin >> num_elements;
+//   uint64_t* numbers = new uint64_t[num_elements];
+//   for (uint64_t i = 0; i < num_elements; i++) {
+//     cin >> *(numbers + i);
+//   }
+//   for (int i = 0; i < num_elements; i++) {
+//     cout << numbers[i] << "\t";
+//   }
+//   cout << endl;
+// }
