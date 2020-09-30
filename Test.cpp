@@ -2,9 +2,13 @@
 #include <cstdint>
 #include <cstring>
 #include <iostream>
+#include <random>
+
 using std::cout;
 using std::endl;
+using std::random_device;
 using std::sort;  // only for demo of this test_script, remove later
+using std::uniform_int_distribution;
 
 /**
  * How to use this script:
@@ -24,8 +28,10 @@ void (*sorting_algorithm)(uint64_t*, uint64_t*) = sort;
 // void sorting_algorithm(uint64_t* a, uint64_t* b) { sort(a, b); }
 
 void swap(uint64_t arr[], uint64_t i, uint64_t j) {
+  // if (i == 0 || i == 999) cout << i << " paired with: " << j << endl;
   if (i == j) {
-    i = i;
+    // cout << "RANDOM BROKEN" << endl;
+    return;
   }
   uint64_t temp = arr[i];
   arr[i] = arr[j];
@@ -66,17 +72,19 @@ bool test_all_numbers(void (*algo_to_be_tested)(uint64_t*, uint64_t*),
   for (uint64_t i = 0; i < num_elements; i++) {
     test_array[i] = i;
   }
-
+  random_device rd;
+  uniform_int_distribution<int> distribution(0, num_elements - 1);
   for (uint64_t i = 0; i < num_elements; i++) {
-    uint64_t rand_index =
-        uint64_t(double(rand()) / (RAND_MAX) * (num_elements - i - 1)) + i;
+    uint64_t rand_index = distribution(rd);
+    // uint64_t(double(rand()) / (RAND_MAX) * (num_elements - i - 1)) + i;
     if (rand_index >= num_elements || rand_index < 0)
       cout << "WARNING: " << rand_index << " rand index is out of bounds."
            << endl;
     swap(test_array, i, rand_index);
   }
-
+  // print_array(test_array, test_array + num_elements);
   algo_to_be_tested(test_array, test_array + num_elements);
+  // print_array(test_array, test_array + num_elements);
   bool answer = is_in_order(test_array, num_elements) &&
                 all_numbers_present(test_array, num_elements);
   delete[] test_array;
@@ -86,8 +94,10 @@ bool test_all_numbers(void (*algo_to_be_tested)(uint64_t*, uint64_t*),
 bool test_random_numbers(void (*algo_to_be_tested)(uint64_t*, uint64_t*),
                          uint64_t num_elements) {
   uint64_t* test_array = new uint64_t[num_elements];
+  random_device rd;
+  uniform_int_distribution<int> distribution(0, INT_MAX);
   for (uint64_t i = 0; i < num_elements; i++) {
-    test_array[i] = uint64_t(double(rand()) / RAND_MAX * UINT64_MAX);
+    test_array[i] = distribution(rd);
   }
   algo_to_be_tested(test_array, test_array + num_elements);
   bool answer = is_in_order(test_array, num_elements);

@@ -1,6 +1,6 @@
 #include <cstdint>
 #include <iostream>
-using std::cin;
+
 using std::cout;
 using std::endl;
 int i = 0;
@@ -39,7 +39,7 @@ void run_sort(uint64_t* start, uint64_t* end) {
   run_sort(mid_addr, end);
 }
 void quicksort(uint64_t* start, uint64_t* end) {
-  print_array(start, end);
+  // print_array(start, end);
   run_sort(start, end);
-  print_array(start, end);
+  // print_array(start, end);
 }
