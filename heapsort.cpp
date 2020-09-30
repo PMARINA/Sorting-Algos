@@ -1,5 +1,5 @@
 #pragma once
-#include "QuickSort.cpp"
+//#include "QuickSort.cpp"
 using namespace std;
 /*
 void makesubheap(uint64_t a[], int i, int n) {
@@ -31,6 +31,8 @@ void makesubheap(uint64_t a[], int i, int n) {
   }
 };
 */
+
+void print_array(uint64_t* , uint64_t* );
 
 void heapify(uint64_t a[], int n, int i) {
   uint64_t temp;

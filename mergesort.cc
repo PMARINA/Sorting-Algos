@@ -7,8 +7,8 @@ void merge(uint64_t* start, int l, int m, int r) {
   int s2 = r - m;
 
   // temp arrays to size of left and right
-  int la[s1];
-  int ra[s2];
+  int* la = new int[s1];
+  int* ra = new int[s2];
 
   for (int i = 0; i < s1; i++)  // move data to temp array Left
     la[i] = start[l + i];
@@ -43,6 +43,8 @@ void merge(uint64_t* start, int l, int m, int r) {
     j++;
     k++;
   }
+  delete[] la;
+  delete[] ra;
 }
 
 void TDmergesort(uint64_t* start, int l, int r) {
