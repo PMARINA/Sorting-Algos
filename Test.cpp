@@ -1,14 +1,14 @@
 #include <algorithm>  // only for demo of this test_script, remove later
+#include <chrono>
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
 #include <iostream>
 #include <random>
 
-#include "QuickSort.cpp"
 #include "heapsort.cpp"
-#include "mergesort.cc"
 
+using namespace std::chrono;
 using std::cout;
 using std::endl;
 using std::random_device;
@@ -30,6 +30,113 @@ using std::uniform_int_distribution;
 
 void (*sorting_algorithm)(uint64_t*, uint64_t*) = heapsort;
 
+void print_array(uint64_t* start, uint64_t* end) {
+  // uint64_t* start = s;
+  // uint64_t* end = e;
+  // cout << i++ << endl;
+  while (start < end) cout << *(start++) << "\t";
+  cout << "\n";
+}
+void run_sort(uint64_t* start, uint64_t* end) {
+  // If recursion done, return
+  if ((end - start) <= 1) return;
+  // print_array(start, end);
+  // Pivot is always the last element (Lomuto)
+  uint64_t pivot_value = *(end - 1);
+  // Do Lomuto Partition-based sorting
+  uint64_t temp;
+  uint64_t* pivot = end;
+  for (uint64_t *read_head = start, *write_head = start; read_head < end;
+       read_head++) {
+    if (*read_head <= pivot_value) {
+      // Swap read and write head values...
+      temp = *read_head;
+      *read_head = *write_head;
+      *write_head = temp;
+      // increment the write head
+      pivot = write_head++;
+    }
+  }
+  // print_array(start, end);
+  // cin >> temp;
+  // Partition and recurse...
+  uint64_t* mid_addr = pivot;
+  run_sort(start, mid_addr);
+  run_sort(mid_addr, end);
+}
+void quicksort(uint64_t* start, uint64_t* end) {
+  // print_array(start, end);
+  run_sort(start, end);
+  // print_array(start, end);
+}
+
+void merge(uint64_t* start, int l, int m, int r) {
+  // size of left and right arrays
+  int s1 = m - l + 1;
+  int s2 = r - m;
+
+  // temp arrays to size of left and right
+  int* la = new int[s1];
+  int* ra = new int[s2];
+
+  for (int i = 0; i < s1; i++)  // move data to temp array Left
+    la[i] = start[l + i];
+
+  for (int j = 0; j < s2; j++)  // move data to temp array Right
+    ra[j] = start[m + j + 1];
+
+  // compare elements and insert into array A until left or right array is empty
+  int i = 0, j = 0;  // reset iteration values
+  int k = l;         // set k for merged list
+  while (i < s1 && j < s2) {
+    if (la[i] <= ra[j]) {
+      start[k] = la[i];
+      i++;
+    } else {
+      start[k] = ra[j];
+      j++;
+    }
+    k++;
+  }
+
+  // put remaining, ordered, numbers into the array a which are remaining in
+  // left or right arrays
+  while (i < s1) {
+    start[k] = la[i];
+    i++;
+    k++;
+  }
+
+  while (j < s2) {
+    start[k] = ra[j];
+    j++;
+    k++;
+  }
+  delete[] la;
+  delete[] ra;
+}
+
+void TDmergesort(uint64_t* start, int l, int r) {
+  if (l < r) {
+    int m = l + (r - l) / 2;  // midpoint
+
+    TDmergesort(start, l, m);      // left side
+    TDmergesort(start, m + 1, r);  // right side
+
+    merge(start, l, m, r);
+  }
+}
+
+void mergesort(uint64_t* start, uint32_t n) { TDmergesort(start, 0, n - 1); }
+
+void mergesort(uint64_t* start, uint64_t* end) {
+  mergesort(start, end - start);
+}
+
+void printArray(uint64_t* start, uint32_t size) {
+  for (int i = 0; i < size; i++) cout << (start[i]) << " ";
+  cout << endl;
+}
 // void sorting_algorithm(uint64_t* a, uint64_t* b) { sort(a, b); }
 // This is our original test-code (imo more comprehensive than yours)
 void swap(uint64_t arr[], uint64_t i, uint64_t j) {
@@ -107,7 +214,11 @@ bool test_random_numbers(void (*algo_to_be_tested)(uint64_t*, uint64_t*),
   }
   print_array(test_array, test_array + num_elements);
   cout << message << "\n";
+  // auto start = high_resolution_clock::now();
   algo_to_be_tested(test_array, test_array + num_elements);
+  // auto stop = high_resolution_clock::now();
+  // auto duration = duration_cast<microseconds>(stop - start);
+  // cout << "TOOK: " << (double)duration.count() / 1e6 << " seconds" << endl;
   bool answer = is_in_order(test_array, num_elements);
   print_array(test_array, test_array + num_elements);
   delete[] test_array;
@@ -238,5 +349,20 @@ int main(int argc, char** argv) {
     cin >> *(numbers + i);
   }
   run_tests(len_and_maxval, num_arrays, numbers, numbers + num_elements);
-  // cout << "DONE" << "\n";
+  cout << "DONE"
+       << "\n";
+  // test_random_numbers(mergesort, 1e8, 1e6, "Mergesort");  // BADWOLF
 }
+
+// Heap Sort does not work yet.
+
+// Quicksort: 0.087323 seconds on 1e6
+// Quicksort: 0.889496 seconds on 1e7
+// Quicksort:  14.2216 seconds on 1e8
+
+// Mergesort: 0.407459 seconds on 1e6
+// Mergesort: 4.347280 seconds on 1e6
+// Mergesort: 46.37960 seconds on 1e8
+
+// People should not have issues with 1e8 elements as that would be 1 GB in
+// memory...
