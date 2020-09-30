@@ -29,15 +29,15 @@ void makesubheap(int a[], int i, int n) {
     }
 };
 
-void makeheap(int a[]) {
-    for (int i = 1; i <= (sizeof(a) / 2); i++) {
-        makesubheap(a, i, sizeof(a));
+void makeheap(int a[], int n) {
+    for (int i = 1; i <= (n / 2)); i++) {
+        makesubheap(a, i, n);
     }
 };
 
-void rebuildheap(int a[]) {
+void rebuildheap(int a[], int n) {
     int temp;
-    for (int i = 2; i <= (sizeof(a) - 1); i++) {
+    for (int i = 2; i <= (n - 1); i++) {
         temp = a[i];
         a[i] = a[0];
         a[0] = temp;
