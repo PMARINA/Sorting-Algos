@@ -8,9 +8,9 @@ int i = 0;
 void print_array(uint64_t* start, uint64_t* end) {
   // uint64_t* start = s;
   // uint64_t* end = e;
-  cout << i++ << endl;
+  // cout << i++ << endl;
   while (start < end) cout << *(start++) << "\t";
-  cout << endl;
+  cout << "\n";
 }
 void run_sort(uint64_t* start, uint64_t* end) {
   // If recursion done, return

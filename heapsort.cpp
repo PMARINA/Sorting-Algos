@@ -52,7 +52,7 @@ void heapsort(uint64_t a[], int n) {
 }
 
 void heapsort(uint64_t* a, uint64_t* b) {
-  print_array(a, b);
+  // print_array(a, b);
   heapsort(a, b - a);
-  print_array(a, b);
+  // print_array(a, b);
 }
