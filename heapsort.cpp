@@ -62,7 +62,7 @@ void makeheap(uint64_t a[], int n) {
 */
 
 void buildheap(uint64_t a[], int n) {
-  for (int i = 1; i <= (n / 2); i++) {
+  for (int i = 1; i <= ((n / 2)); i++) {
     heapify(a, n, i);
   }
 }
@@ -80,10 +80,10 @@ void rebuildheap(uint64_t a[], int n) {
 void heapsort(uint64_t a[], int n) {
   uint64_t temp;
   buildheap(a, n);
-  for (int i = 2; i <= n; i++) {
-    temp = a[1];
-    a[1] = a[i];
-    a[i] = temp;
+  for (int i = 2; i <= (n); i++) {
+    temp = a[0];
+    a[0] = a[0];
+    a[0] = temp;
     n = n - 1;
     heapify(a, n, 1);
   }
@@ -91,6 +91,6 @@ void heapsort(uint64_t a[], int n) {
 
 void heapsort(uint64_t* a, uint64_t* b) {
   print_array(a, b);
-  heapsort(a, b - a);
+  heapsort(a, b - a - 1);
   print_array(a, b);
 }
