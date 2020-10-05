@@ -4,16 +4,19 @@
 #include <cstdio>
 #include <cstring>
 #include <iostream>
+#include <memory>
 #include <random>
 
-#include "heapsort.cpp"
-
 using namespace std::chrono;
+using std::cin;
 using std::cout;
 using std::endl;
 using std::random_device;
 using std::sort;  // only for demo of this test_script, remove later
+using std::string;
+using std::swap;
 using std::uniform_int_distribution;
+#define MAX_INT 2147483647
 
 /**
  * How to use this script:
@@ -28,8 +31,46 @@ using std::uniform_int_distribution;
  * elements.
  */
 
-void (*sorting_algorithm)(uint64_t*, uint64_t*) = heapsort;
+void heapify(uint64_t a[], int n, int i) {
+  uint64_t temp;
+  int largest = i;
+  int le = (2 * i);
+  int ri = (2 * i) + 1;
+  if ((le <= n) && (a[le] > a[largest])) {
+    largest = le;
+  }
+  if ((ri <= n) && (a[ri] > a[largest])) {
+    largest = ri;
+  }
+  if (largest != i) {
+    swap(a[largest], a[i]);
+    heapify(a, n, largest);
+  }
+}
 
+void buildheap(uint64_t a[], int n) {
+  for (int i = (n / 2) + 1; i >= 1; i--) {
+    heapify(a, n, i);
+  }
+  // printHeap(a, n);
+}
+
+void heapsort(uint64_t a[], int n) {
+  uint64_t temp;
+  buildheap(a, n);
+  uint64_t temp_n = n;
+  for (int i = n; i >= 2; i--) {
+    swap(a[1], a[temp_n]);
+    heapify(a, --temp_n, 1);
+  }
+}
+
+void heapsort(uint64_t* a, uint64_t* b) {
+  // print_array(a, b);
+  heapsort(a - 1, b - a);
+  // print_array(a, b);
+}
+void (*sorting_algorithm)(uint64_t*, uint64_t*) = heapsort;
 void print_array(uint64_t* start, uint64_t* end) {
   // uint64_t* start = s;
   // uint64_t* end = e;
@@ -208,7 +249,7 @@ bool test_random_numbers(void (*algo_to_be_tested)(uint64_t*, uint64_t*),
                          string message) {
   uint64_t* test_array = new uint64_t[num_elements];
   random_device rd;
-  uniform_int_distribution<int> distribution(0, 999999999999);
+  uniform_int_distribution<int> distribution(0, max_val);
   for (uint64_t i = 0; i < num_elements; i++) {
     test_array[i] = distribution(rd);
   }
@@ -227,7 +268,7 @@ bool test_random_numbers(void (*algo_to_be_tested)(uint64_t*, uint64_t*),
 
 bool test_random_numbers(void (*algo_to_be_tested)(uint64_t*, uint64_t*),
                          uint64_t num_elements) {
-  return test_random_numbers(algo_to_be_tested, num_elements, 2147483647,
+  return test_random_numbers(algo_to_be_tested, num_elements, MAX_INT,
                              "");  // 2147483647 is INT_MAX
 }
 
@@ -283,23 +324,6 @@ bool run_trials(uint64_t num_elements, uint64_t num_tests) {
   return true;
 }
 
-int main(int argc, char** argv) {
-  if (argc != 3) {
-    cout << "Expected number of elements followed by number of tests to run."
-         << "\n";
-  } else {
-    uint64_t num_elements = atoi(argv[1]);
-    uint64_t num_tests = atoi(argv[2]);
-    bool algorithm_successful = run_trials(num_elements, num_tests) &&
-                                run_trials(num_elements + 1, num_tests);
-    if (algorithm_successful) {
-      cout << "All tests passed successfully!" << "\n";
-    } else {
-      cout << "Tests failed..." << "\n";
-    }
-  }
-}
-
 void run_random_tests(uint64_t len_and_maxval, uint64_t num_arrays) {
   for (int i = 0; i < num_arrays; i++) {
     test_random_numbers(quicksort, len_and_maxval, len_and_maxval, "Quicksort");
@@ -336,8 +360,8 @@ void run_tests(uint64_t len_and_maxval, uint64_t num_arrays, uint64_t* start,
   run_random_tests(len_and_maxval, num_arrays);
   run_specific_case(start, end);
 }
-/*
-int main(int argc, char** argv) {
+
+int submission_main(int argc, char** argv) {
   uint64_t len_and_maxval;
   cin >> len_and_maxval;
   uint64_t num_arrays;
@@ -351,10 +375,24 @@ int main(int argc, char** argv) {
   run_tests(len_and_maxval, num_arrays, numbers, numbers + num_elements);
   cout << "DONE"
        << "\n";
-  // test_random_numbers(mergesort, 1e8, 1e6, "Mergesort");  // BADWOLF
 }
 
-// Heap Sort does not work yet.
+int timing_main() {
+  test_random_numbers(heapsort, 1e8, 1e8, "heapsort");
+}  // BADWOLF }
+
+int main(int argc, char** argv) {
+#define submission true
+  if (submission) {
+    submission_main(argc, argv);
+  } else {
+    timing_main();
+  }
+}
+
+// Heapsort: 0.487684 seconds on 1e6
+// Heapsort:  8.12749 seconds on 1e7
+// Heapsort:  126.184 seconds on 1e8
 
 // Quicksort: 0.087323 seconds on 1e6
 // Quicksort: 0.889496 seconds on 1e7
@@ -366,4 +404,6 @@ int main(int argc, char** argv) {
 
 // People should not have issues with 1e8 elements as that would be 1 GB in
 // memory...
-*/
+
+// NOTE: We get segfault when compiled with -O options, but always after the
+// sorting algorithm returns and we print out the time it took. Very strange.
